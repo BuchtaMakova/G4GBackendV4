@@ -27,5 +27,13 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     }
+  },
+  "Jwt": {
+    "Issuer": "https://localhost:7285",
+    "Audience": "https://localhost:7285",
+    "Key": "SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+  },
+  "ConnectionStrings": {
+    "G4GDb": "Server=localhost;Database=G4GDb;Trusted_Connection=True;TrustServerCertificate=true;"
   }
 }
