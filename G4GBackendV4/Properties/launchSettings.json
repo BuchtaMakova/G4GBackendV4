@@ -14,7 +14,7 @@
       "dotnetRunMessages": true,
       "launchBrowser": true,
       "launchUrl": "swagger",
-      "applicationUrl": "https://localhost:7285;http://localhost:5244",
+      "applicationUrl": "https://localhost:7100;http://localhost:5268",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
@@ -29,8 +29,8 @@
     }
   },
   "Jwt": {
-    "Issuer": "https://localhost:7285",
-    "Audience": "https://localhost:7285",
+    "Issuer": "https://localhost:7100",
+    "Audience": "https://localhost:7100",
     "Key": "SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
   },
   "ConnectionStrings": {
