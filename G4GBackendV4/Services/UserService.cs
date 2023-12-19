@@ -46,7 +46,7 @@ namespace G4GBackendV4.Services
 
         public async Task<User> GetByUsername(string username)
         {
-            return _context.Users!.FirstOrDefault(q => q.Username == username) ??
+            return _context.Users!.Where(q => q.Username == username).Include(ac => ac.Contents).First() ??
                    throw CreateException($"User with id {username} does not exist");
         }
     }

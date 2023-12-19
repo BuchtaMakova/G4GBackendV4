@@ -55,19 +55,13 @@ namespace G4GBackendV4.Controllers
         public async Task<ActionResult> GetAccount(string name)
         {
             if (_context.Users != null)
-                return Ok(await _context.Users.Include(ac => ac.Contents).Select(ac => new AccountDto
+            {
+                User ac = await _userService.GetByUsername(name);
+                return Ok(new AccountDto
                 {
                     IdAccount = ac.Id,
                     Username = ac.Username,
-                    CommentsPosted = ac.Comments.Select(cn => new CommentDto
-                    {
-                        AccountIdAccount = cn.UserId,
-                        AccountUsername = cn.User!.Username,
-                        ContentIdContent = cn.ContentId,
-                        IdComment = cn.Id,
-                        Posted = cn.Posted,
-                        Text = cn.Text
-                    }).Count(cm => cm.AccountUsername == ac.Username),
+                    CommentsPosted = ac.Comments.Count(cm => cm.User.Username == ac.Username),
                     Comments = ac.Comments.Select(cn => new CommentDto
                     {
                         AccountIdAccount = cn.UserId,
@@ -77,22 +71,7 @@ namespace G4GBackendV4.Controllers
                         Posted = cn.Posted,
                         Text = cn.Text
                     }).Where(cm => cm.AccountUsername == ac.Username).ToList(),
-                    ContentsPosted = ac.Contents.Select(cn => new ContentDto
-                    {
-                        Account = new AccountDto
-                        {
-                            IdAccount = cn.UserId,
-                            Username = cn.User.Username,
-                            CommentsPosted = cn.User.Comments.Count(q => q.UserId == cn.UserId),
-                            ContentsPosted = cn.User.Contents.Count(q => q.UserId == cn.UserId),
-                        },
-                        Headline = cn.Headline,
-                        IdContent = cn.Id,
-                        Posted = cn.Posted,
-                        SubcategoryIdSubcategory = cn.SubcategoryId,
-                        Text = cn.Text,
-                        Views = cn.Views
-                    }).Count(ct => ct.Account.Username == ac.Username),
+                    ContentsPosted = ac.Contents.Count(ct => ct.User.Username == ac.Username),
                     Contents = ac.Contents.Select(cn => new ContentDto
                     {
                         Account = new AccountDto
@@ -109,7 +88,10 @@ namespace G4GBackendV4.Controllers
                         Text = cn.Text,
                         Views = cn.Views
                     }).Where(ct => ct.Account.Username == ac.Username).ToList()
-                }).Where(q => q.Username == name).FirstAsync());
+                });
+            }
+
+            
             return BadRequest();
         }
     }

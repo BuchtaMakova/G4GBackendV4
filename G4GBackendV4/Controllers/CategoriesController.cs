@@ -54,9 +54,9 @@ namespace G4GBackendV4.Controllers
                 Icon = sc.Icon,
                 IdSubcategory = sc.Id,
                 Name = sc.Name,
-                lastContentInSubCategory = lastContent,
-                totalCommentInInSubCategory = totalComments,
-                totalContentsInSubCategory = totalContents
+                LastContentInSubCategory = lastContent,
+                TotalCommentInInSubCategory = totalComments,
+                TotalContentsInSubCategory = totalContents
             };
         }
 
