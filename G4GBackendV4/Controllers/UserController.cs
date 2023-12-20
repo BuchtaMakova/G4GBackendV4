@@ -57,12 +57,10 @@ namespace G4GBackendV4.Controllers
             if (_context.Users != null)
             {
                 User ac = await _userService.GetByUsername(name);
-                return Ok(new AccountDto
-                {
-                    IdAccount = ac.Id,
-                    Username = ac.Username,
-                    CommentsPosted = ac.Comments.Count(cm => cm.User.Username == ac.Username),
-                    Comments = ac.Comments.Select(cn => new CommentDto
+
+                var comments = ac.Comments
+                    .Where(cm => cm.User.Username == ac.Username)
+                    .Select(cn => new CommentDto
                     {
                         AccountIdAccount = cn.UserId,
                         AccountUsername = cn.User!.Username,
@@ -70,9 +68,12 @@ namespace G4GBackendV4.Controllers
                         IdComment = cn.Id,
                         Posted = cn.Posted,
                         Text = cn.Text
-                    }).Where(cm => cm.AccountUsername == ac.Username).ToList(),
-                    ContentsPosted = ac.Contents.Count(ct => ct.User.Username == ac.Username),
-                    Contents = ac.Contents.Select(cn => new ContentDto
+                    })
+                    .ToList();
+
+                var contents = ac.Contents
+                    .Where(ct => ct.User.Username == ac.Username)
+                    .Select(cn => new ContentDto
                     {
                         Account = new AccountDto
                         {
@@ -87,11 +88,20 @@ namespace G4GBackendV4.Controllers
                         SubcategoryIdSubcategory = cn.SubcategoryId,
                         Text = cn.Text,
                         Views = cn.Views
-                    }).Where(ct => ct.Account.Username == ac.Username).ToList()
+                    })
+                    .ToList();
+
+                return Ok(new AccountDto
+                {
+                    IdAccount = ac.Id,
+                    Username = ac.Username,
+                    CommentsPosted = comments.Count,
+                    Comments = comments,
+                    ContentsPosted = contents.Count,
+                    Contents = contents
                 });
             }
 
-            
             return BadRequest();
         }
     }
