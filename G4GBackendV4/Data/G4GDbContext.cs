@@ -1,6 +1,7 @@
 ﻿using G4GBackendV4.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.Data;
 using System.Reflection.Emit;
 
 namespace G4GBackendV4.Data
@@ -21,6 +22,7 @@ namespace G4GBackendV4.Data
         public DbSet<SubCategory>? SubCategories { get; set; }
         public DbSet<Content>? Contents { get; set; }
         public DbSet<Comment>? Comments { get; set; }
+        public DbSet<Role>? Roles { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -35,9 +37,6 @@ namespace G4GBackendV4.Data
                     .IsRequired();
 
                 entity.Property(q => q.PasswordHash)
-                    .IsRequired();
-
-                entity.Property(q => q.Role)
                     .IsRequired();
             });
 
@@ -102,6 +101,16 @@ namespace G4GBackendV4.Data
                 entity.Property(q => q.Name).IsRequired();
 
                 entity.Property(q => q.Icon).IsRequired();
+            });
+
+            modelBuilder.Entity<Role>(entity =>
+            {
+                entity.HasKey(q => q.Id);
+                entity.Property(q => q.Id).ValueGeneratedOnAdd();
+
+                entity.Property(q => q.Name).IsRequired();
+
+                entity.HasMany(q => q.Users).WithMany(q => q.Roles);
             });
         }
 

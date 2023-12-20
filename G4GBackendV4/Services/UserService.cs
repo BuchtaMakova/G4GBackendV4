@@ -18,7 +18,8 @@ namespace G4GBackendV4.Services
 
         public async Task<User> GetUserByCredentials(string? username, string? password)
         {
-            var user = await _context.Users!.FirstOrDefaultAsync(q => q.Username == username.ToLower())
+            var user = await _context.Users!.Include(q => q.Roles)
+                           .FirstOrDefaultAsync(q => q.Username == username.ToLower())
                        ?? throw CreateException($"User {username} does not exist.");
             if (!_securityService.VerifyPassword(password, user.PasswordHash!))
                 throw CreateException("Credentials are not valid.");
@@ -36,7 +37,10 @@ namespace G4GBackendV4.Services
             if (_context.Users!.Any(q => q.Username == username))
                 throw CreateException($"User {username} already exists.");
             var hash = _securityService.HashPassword(password);
-            var ret = new User { Username = username, PasswordHash = hash };
+            var roles = await (_context.Roles ??
+                               throw new InvalidOperationException($"role {CustomRoles.User} does not exists"))
+                .Where(q => q.Name == CustomRoles.User).ToListAsync();
+            var ret = new User { Username = username, PasswordHash = hash, Roles = roles };
 
             _context.Users!.Add(ret);
             await _context.SaveChangesAsync();
@@ -46,7 +50,9 @@ namespace G4GBackendV4.Services
 
         public async Task<User> GetByUsername(string username)
         {
-            return _context.Users!.Where(q => q.Username == username).Include(ac => ac.Contents).First() ??
+            return await _context.Users!.Where(q => q.Username == username).Include(ac => ac.Contents)
+                       .Include(q => q.Roles)
+                       .FirstAsync() ??
                    throw CreateException($"User with id {username} does not exist");
         }
     }

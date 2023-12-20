@@ -16,6 +16,7 @@ builder.Services.AddSingleton<SecurityService>();
 builder.Services.AddTransient<UserService>();
 builder.Services.AddTransient<ContextService>();
 builder.Services.AddTransient<ContentService>();
+builder.Services.AddTransient<RoleService>();
 
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
@@ -41,11 +42,11 @@ builder.Services.AddSwaggerGen(opt =>
             {
                 Reference = new OpenApiReference
                 {
-                    Type=ReferenceType.SecurityScheme,
-                    Id="Bearer"
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
                 }
             },
-            new string[]{}
+            new string[] { }
         }
     });
 });

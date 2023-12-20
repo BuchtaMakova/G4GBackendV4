@@ -52,6 +52,7 @@ namespace G4GBackendV4.Controllers
 
         [HttpGet("ByUsername")]
         [Authorize(Roles = CustomRoles.User + "," + CustomRoles.Admin)]
+        //[AllowAnonymous]
         public async Task<ActionResult> GetAccount(string name)
         {
             if (_context.Users != null)
@@ -91,6 +92,8 @@ namespace G4GBackendV4.Controllers
                     })
                     .ToList();
 
+                List<string?> roles = ac.Roles.Select(r => r.Name).ToList();
+
                 return Ok(new AccountDto
                 {
                     IdAccount = ac.Id,
@@ -98,7 +101,8 @@ namespace G4GBackendV4.Controllers
                     CommentsPosted = comments.Count,
                     Comments = comments,
                     ContentsPosted = contents.Count,
-                    Contents = contents
+                    Contents = contents,
+                    Roles = roles
                 });
             }
 

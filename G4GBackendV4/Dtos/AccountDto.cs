@@ -8,5 +8,6 @@
         public long ContentsPosted { get; set; }
         public List<CommentDto>? Comments { get; set; }
         public List<ContentDto>? Contents { get; set; }
+        public List<string>? Roles { get; set; }
     }
 }

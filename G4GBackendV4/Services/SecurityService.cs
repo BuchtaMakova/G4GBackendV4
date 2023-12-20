@@ -31,26 +31,29 @@ namespace G4GBackendV4.Services
         public string BuildJwtToken(User user)
         {
             var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
-            var roles = new List<String> { user.Role };
-            var roleClaims = roles.ToDictionary(
-                q => ClaimTypes.Role,
-                q => (object)q.ToUpper());
 
-            var tokenDescriptor = new SecurityTokenDescriptor
+            var claims = new List<Claim>
             {
-                Subject = new ClaimsIdentity(new[]
-                {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Username),
                 new Claim(JwtRegisteredClaimNames.UniqueName, user.Username),
                 new Claim(JwtRegisteredClaimNames.Aud, _configuration["Jwt:Audience"] ?? string.Empty),
                 new Claim(JwtRegisteredClaimNames.Iss, _configuration["Jwt:Issuer"] ?? string.Empty),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-            }),
-                Expires = DateTime.UtcNow.AddSeconds(_configuration.GetSection("Jwt").GetValue<int>("TokenExpirationInSeconds")),
+            };
+
+            foreach (var role in user.Roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role.Name));
+            }
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.UtcNow.AddSeconds(_configuration.GetSection("Jwt")
+                    .GetValue<int>("TokenExpirationInSeconds")),
                 SigningCredentials =
                     new SigningCredentials(new SymmetricSecurityKey(key),
-                        SecurityAlgorithms.HmacSha512Signature),
-                Claims = roleClaims
+                        SecurityAlgorithms.HmacSha512Signature)
             };
 
             var tokenHandler = new JwtSecurityTokenHandler();
