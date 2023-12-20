@@ -46,7 +46,7 @@ namespace G4GBackendV4.Services
                 new Claim(JwtRegisteredClaimNames.Iss, _configuration["Jwt:Issuer"] ?? string.Empty),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             }),
-                Expires = DateTime.UtcNow.AddSeconds(TokenExpirationInSeconds),
+                Expires = DateTime.UtcNow.AddSeconds(_configuration.GetSection("Jwt").GetValue<int>("TokenExpirationInSeconds")),
                 SigningCredentials =
                     new SigningCredentials(new SymmetricSecurityKey(key),
                         SecurityAlgorithms.HmacSha512Signature),

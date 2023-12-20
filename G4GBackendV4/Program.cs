@@ -21,9 +21,6 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
 );
 
-
-
-
 builder.Services.AddSwaggerGen(opt =>
 {
     opt.SwaggerDoc("v1", new OpenApiInfo { Title = "MyAPI", Version = "v1" });
@@ -52,15 +49,6 @@ builder.Services.AddSwaggerGen(opt =>
         }
     });
 });
-
-
-
-
-
-
-
-
-
 
 builder.Services.AddAuthorization();
 builder.Services.AddAuthentication(opt =>

@@ -22,6 +22,7 @@ namespace G4GBackendV4.Data
         public DbSet<Content>? Contents { get; set; }
         public DbSet<Comment>? Comments { get; set; }
 
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>(entity =>
