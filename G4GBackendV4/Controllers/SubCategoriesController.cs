@@ -1,4 +1,5 @@
-﻿using G4GBackendV4.Dtos;
+﻿using G4GBackendV4.Data;
+using G4GBackendV4.Dtos;
 using G4GBackendV4.Models;
 using G4GBackendV4.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -13,9 +14,9 @@ namespace G4GBackendV4.Controllers
     [Authorize]
     public class SubCategoriesController : ControllerBase
     {
-        private readonly ContextService _context;
+        private readonly G4GDbContext _context;
 
-        public SubCategoriesController(ContextService context)
+        public SubCategoriesController(G4GDbContext context)
         {
             _context = context;
         }
@@ -25,8 +26,8 @@ namespace G4GBackendV4.Controllers
         public async Task<IActionResult> Create(PostSubCategoryDto subCat)
         {
             var sub = new SubCategory { Name = subCat.Name!, Icon = subCat.Icon!, CategoryId = subCat.CategoryId };
-            _context.GetContext().Add(sub);
-            await _context.GetContext().SaveChangesAsync();
+            _context.Add(sub);
+            await _context.SaveChangesAsync();
             var cont = new Content
             {
                 Headline = "New subcategory",
@@ -36,8 +37,8 @@ namespace G4GBackendV4.Controllers
                 SubcategoryId = sub.Id,
                 Views = 0
             };
-            _context.GetContext().Add(cont);
-            await _context.GetContext().SaveChangesAsync();
+            _context.Add(cont);
+            await _context.SaveChangesAsync();
 
 
             return Ok(sub);
@@ -49,10 +50,10 @@ namespace G4GBackendV4.Controllers
         {
             if (categoryIdCategory == 0)
             {
-                return await _context.GetContext().SubCategories.ToListAsync();
+                return await _context.SubCategories.ToListAsync();
             }
 
-            return await _context.GetContext().SubCategories.Where(su => su.CategoryId == categoryIdCategory)
+            return await _context.SubCategories.Where(su => su.CategoryId == categoryIdCategory)
                 .ToListAsync();
         }
     }

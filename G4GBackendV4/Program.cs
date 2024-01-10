@@ -14,9 +14,10 @@ builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 builder.Services.AddDbContext<G4GDbContext>();
 builder.Services.AddSingleton<SecurityService>();
 builder.Services.AddTransient<UserService>();
-builder.Services.AddTransient<ContextService>();
 builder.Services.AddTransient<ContentService>();
 builder.Services.AddTransient<RoleService>();
+builder.Services.AddTransient<CategoriesService>();
+builder.Services.AddTransient<CommentsService>();
 
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore

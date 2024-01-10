@@ -1,4 +1,5 @@
-﻿using G4GBackendV4.Dtos;
+﻿using G4GBackendV4.Data;
+using G4GBackendV4.Dtos;
 using G4GBackendV4.Models;
 using G4GBackendV4.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -13,60 +14,21 @@ namespace G4GBackendV4.Controllers
     [Authorize]
     public class CommentsController : ControllerBase
     {
-        private readonly ContextService _context;
+        private readonly G4GDbContext _context;
+        private readonly CommentsService _commentsService; 
 
-        public CommentsController(ContextService context)
+        public CommentsController(G4GDbContext context, CommentsService commentsService)
         {
             _context = context;
+            _commentsService = commentsService;
         }
 
         [HttpGet("GetComments")]
         [AllowAnonymous]
         public async Task<IActionResult> GetComments(int contentIdContent)
         {
-            var comments = await GetCommentsFromDatabase(contentIdContent);
+            var comments = await _commentsService.GetCommentsFromDatabase(contentIdContent);
             return Ok(comments);
-        }
-
-        private async Task<List<CommentDto>> GetCommentsFromDatabase(int contentIdContent)
-        {
-            var comments = _context.GetContext().Comments;
-            if (contentIdContent == 0)
-            {
-                return await comments.Select(comment => GetCommentDto(comment, _context)).ToListAsync();
-            }
-            return await comments.Where(comment => comment.ContentId == contentIdContent)
-                              .Select(comment => GetCommentDto(comment, _context))
-                              .ToListAsync();
-        }
-
-        private static CommentDto GetCommentDto(Comment comment, ContextService context)
-        {
-            var user = context.GetContext().Users.First(user => user.Id == comment.UserId);
-            var accountDto = GetAccountDto(user, context);
-
-            return new CommentDto
-            {
-                IdComment = comment.Id,
-                ContentIdContent = comment.ContentId,
-                Text = comment.Text,
-                Posted = comment.Posted,
-                Account = accountDto
-            };
-        }
-
-        private static AccountDto GetAccountDto(User user, ContextService context)
-        {
-            var commentsPosted = user.Comments.Count(comment => comment.UserId == user.Id);
-            var contentsPosted = user.Contents.Count(content => content.UserId == user.Id);
-
-            return new AccountDto
-            {
-                IdAccount = user.Id,
-                Username = user.Username,
-                CommentsPosted = commentsPosted,
-                ContentsPosted = contentsPosted
-            };
         }
 
         [HttpPost("Create")]
@@ -81,8 +43,8 @@ namespace G4GBackendV4.Controllers
                 ContentId = comment.ContentIdContent
             };
 
-            _context.GetContext().Comments?.Add(comm);
-            await _context.GetContext().SaveChangesAsync();
+            _context.Comments?.Add(comm);
+            await _context.SaveChangesAsync();
 
             return Ok(comm);
         }
@@ -91,14 +53,14 @@ namespace G4GBackendV4.Controllers
         [Authorize(Roles = CustomRoles.User + "," + CustomRoles.Admin)]
         public async Task<IActionResult> Update(UpdateCommentDto comment)
         {
-            var comm = await _context.GetContext().Comments!.FindAsync(comment.Id);
+            var comm = await _context.Comments!.FindAsync(comment.Id);
             if (comm == null) return NotFound();
             comm.Text = comment.Text;
             comm.UserId = comment.AccountIdAccount;
             comm.ContentId = comment.ContentIdContent;
             try
             {
-                await _context.GetContext().SaveChangesAsync();
+                await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -112,11 +74,11 @@ namespace G4GBackendV4.Controllers
         [Authorize(Roles = CustomRoles.User + "," + CustomRoles.Admin)]
         public async Task<IActionResult> Delete(long id)
         {
-            var comment = await _context.GetContext().Comments!.FindAsync(id);
+            var comment = await _context.Comments!.FindAsync(id);
             if (comment == null) return NotFound();
 
-            _context.GetContext().Comments?.Remove(comment);
-            await _context.GetContext().SaveChangesAsync();
+            _context.Comments?.Remove(comment);
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }
